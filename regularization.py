@@ -56,7 +56,7 @@ class OBJECT_OT_Regularization(bpy.types.Operator):
 
         # for presice deformation
         if meanEdgeLength(me.edges)<OBJECT_OT_Regularization.DELTA:
-            OBJECT_OT_Regularization.DELTA *= 1e-3
+            OBJECT_OT_Regularization.DELTA *= 1e-1
         
     def cost(self):
         self.computeEdgeLengthUniqueness()
@@ -199,9 +199,10 @@ class OBJECT_OT_Regularization(bpy.types.Operator):
     
     def execute(self, context):
         #me = bpy.context.object.data
-        me = bpy.context.view_layer.objects.active.data
-        if me is None:
-            return {'FINISHED'}
+        selections = bpy.context.selected_objects
+        if not selections:
+            return {'CANCELLED'}
+        me = selections[0].data
         # create new bmesh
         bm = bmesh.new()
         bm.from_mesh(me)
@@ -249,7 +250,7 @@ def length(ed):
     ev = ed.verts[1].co
     return distance(sv, ev)
 def distance(a, b):
-	  return np.sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) + (a.z-b.z)*(a.z-b.z))
+	return np.sqrt((a.x-b.x)*(a.x-b.x) + (a.y-b.y)*(a.y-b.y) + (a.z-b.z)*(a.z-b.z))
 
 # mean length of edges
 def meanEdgeLength(edges):
